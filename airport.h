@@ -5,7 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#ifdef _WIN32
 #include <windows.h>
+#endif
 #include <string.h>
 
 #define MAX 50
@@ -28,7 +30,8 @@ typedef struct voo
     unsigned int capacidade;
     char destino[MAX_READ];
     char horario[6];
-
+    float preco; 
+    float preco_classe;
 } v;
 
 void cadastrar_voo();

@@ -1,262 +1,277 @@
 #include "airport.h"
 #include "cJSON.h"
-#include "cJSON.txt"
 
 void cadastrar_voo(){
     v cad_voo;
     char linha[MAX_READ];
     int contador_id = -1;
     int x = 1;
-    do{
-    printf("\n----------Cadastrar voo----------\n");
-
-    printf("\nDigite o nome do voo: ");
-    scanf(" %[^\n]", cad_voo.nome_voo);
-
-    printf("\nDigite a capacidade disponível: ");
-    scanf("%u", &cad_voo.capacidade);
-
-    printf("\nDigite o destino da viagem: ");
-    scanf(" %[^\n]", cad_voo.destino);
-
-    printf("\nDigite o horário: ");
-    scanf(" %[^\n]", cad_voo.horario);
-
-    if(contador_id == -1){
-        contador_id = 0;
-        FILE *verificar = fopen("voos.json", "r");
-        if (verificar != NULL)
-        {
-            while (fgets(linha, sizeof(linha), verificar) != NULL)
-            {
-                cJSON *teste_json = cJSON_Parse(linha);
-                if (teste_json != NULL)
-                {
-                    contador_id++;
-                    cJSON_Delete(teste_json);
-                }
-                
-            }
-            fclose(verificar);
-        }
-        cad_voo.id = contador_id + 1;
-    } else{
-        cad_voo.id = contador_id +1;
-    }
-  
-    cJSON *voo_disp = cJSON_CreateObject();
-
-    cJSON_AddNumberToObject(voo_disp, "id", cad_voo.id);
-    cJSON_AddStringToObject(voo_disp, "nome_voo", cad_voo.nome_voo);
-    cJSON_AddStringToObject(voo_disp, "destino", cad_voo.destino);
-    cJSON_AddStringToObject(voo_disp, "horário", cad_voo.horario);
-    cJSON_AddNumberToObject(voo_disp, "capacidade", cad_voo.capacidade);
-    cJSON_AddNumberToObject(voo_disp, "cap_primeira", cad_voo.capacidade / 2);
-    cJSON_AddNumberToObject(voo_disp, "cap_economica", cad_voo.capacidade - (cad_voo.capacidade / 2));
-
-    char *texto_JSON = cJSON_PrintUnformatted(voo_disp);
-
-    FILE *arquivo = fopen("voos.json", "a");
-
-    if (arquivo != NULL)
-    {
-        fprintf(arquivo, "%s\n", texto_JSON);
-        fflush(arquivo);
-        fclose(arquivo);
-        printf("\nVoo cadastrado com sucesso!");
-
-        contador_id = cad_voo.id;
-    }else{
-        printf("\nErro ao cadastrar voo");
-        cJSON_Delete(voo_disp);
-        free(texto_JSON);
-        return; 
-    }
     
-    free(texto_JSON);
-    cJSON_Delete(voo_disp);
+    do {
+        printf("\n----------Cadastrar voo----------\n");
 
-    printf("\nDeseja continuar? [digite 1 ou 0 para continuar]");
-    scanf("%d", &x);
+        printf("\nDigite o nome do voo: ");
+        scanf(" %[^\n]", cad_voo.nome_voo);
 
-    }while(x != 0);
-  
+        printf("\nDigite a capacidade disponível: ");
+        scanf("%u", &cad_voo.capacidade);
+
+        printf("\nDigite o destino da viagem: ");
+        scanf(" %[^\n]", cad_voo.destino);
+
+        printf("\nDigite o horário: ");
+        scanf(" %[^\n]", cad_voo.horario);
+
+        printf("\nDigite o valor do voo: ");
+        scanf("%f", &cad_voo.preco);
+
+        printf("\nDigite o valor da primeira classe: ");
+        scanf("%f", &cad_voo.preco_classe);
+
+        if(contador_id == -1){
+            contador_id = 0;
+            FILE *verificar = fopen("voos.json", "r");
+            if (verificar != NULL) {
+                while (fgets(linha, sizeof(linha), verificar) != NULL) {
+                    cJSON *teste_json = cJSON_Parse(linha);
+                    if (teste_json != NULL) {
+                        contador_id++;
+                        cJSON_Delete(teste_json);
+                    }
+                }
+                fclose(verificar);
+            }
+            cad_voo.id = contador_id + 1;
+        } else {
+            cad_voo.id = contador_id + 1;
+        }
+      
+        cJSON *voo_disp = cJSON_CreateObject();
+        cJSON_AddNumberToObject(voo_disp, "id", cad_voo.id);
+        cJSON_AddStringToObject(voo_disp, "nome_voo", cad_voo.nome_voo);
+        cJSON_AddStringToObject(voo_disp, "destino", cad_voo.destino);
+        cJSON_AddStringToObject(voo_disp, "horário", cad_voo.horario);
+        cJSON_AddNumberToObject(voo_disp, "capacidade", cad_voo.capacidade);
+        cJSON_AddNumberToObject(voo_disp, "cap_primeira", cad_voo.capacidade / 2);
+        cJSON_AddNumberToObject(voo_disp, "cap_economica", cad_voo.capacidade - (cad_voo.capacidade / 2));
+        cJSON_AddNumberToObject(voo_disp, "preco", cad_voo.preco); 
+        cJSON_AddNumberToObject(voo_disp, "preco_primeira_classe", cad_voo.preco_classe);
+
+        char *texto_JSON = cJSON_PrintUnformatted(voo_disp);
+        FILE *arquivo = fopen("voos.json", "a");
+
+        if (arquivo != NULL) {
+            fprintf(arquivo, "%s\n", texto_JSON);
+            fflush(arquivo);
+            fclose(arquivo);
+            printf("\nVoo cadastrado com sucesso!");
+            contador_id = cad_voo.id;
+        } else {
+            printf("\nErro ao cadastrar voo");
+            cJSON_Delete(voo_disp);
+            free(texto_JSON);
+            return; 
+        }
+        
+        free(texto_JSON);
+        cJSON_Delete(voo_disp);
+
+        printf("\nDeseja continuar? [1 para Sim / 0 para Não]: ");
+        scanf("%d", &x);
+
+    } while(x != 0);
 }
-
-
 
 void historico_voo(){
     char linha[MAX_READ];
-
     FILE *arquivo = fopen("voos.json", "r");
-    if (arquivo != NULL)
-    {
-        while (fgets(linha, sizeof(linha), arquivo) != NULL)
-    {
-        cJSON *voo_json = cJSON_Parse(linha);
-        if(voo_json != NULL){
-            int id = cJSON_GetObjectItem(voo_json, "id")->valueint;
-            char *nome = cJSON_GetObjectItem(voo_json, "nome_voo")->valuestring;
-            int capacidade = cJSON_GetObjectItem(voo_json, "capacidade")->valueint;
-            int cap_primeira = cJSON_GetObjectItem(voo_json, "cap_primeira")->valueint;
-            int cap_economica = cJSON_GetObjectItem(voo_json, "cap_economica")->valueint;
-            char *destino = cJSON_GetObjectItem(voo_json, "destino")->valuestring;
-            char *horario = cJSON_GetObjectItem(voo_json, "horário")->valuestring;
-
-            printf("\nID %d | Voo: %s | Horário: %s | Destino %s | capacidade: %d\n | 1º Classe: %d | C.Econômica: %d\n", id, nome, horario, destino, capacidade, cap_primeira, cap_economica);
-            cJSON_Delete(voo_json);
-        }
-    }
-    }else{
-        printf("\nArquivo não encontrado ou nenhum dado cadastrado");
-        return;
-    }
     
-    fclose(arquivo);
-    system("\npause\n");
-}
-
-void cadastrar_passageiro(){
-int opc = 1;
-
-do{
-    p cad_passa; 
-    char linha[MAX_READ];
-    int escolher_id;
-    int voo_encontrado = 0;
-    int contador_id = 0;
-
-    printf("\n---------Cadastrar passageiro----------\n");
-
-    printf("Digite o nome do passageiro: ");
-    scanf(" %[^\n]", cad_passa.nome_passageiro);
-
-    printf("Digite o cpf do passageiro: ");
-    scanf(" %[^\n]", cad_passa.cpf);
-
-    printf("Digite a classe:\n[1] para primeira classe\n[0] para classe econômica\nOpção: ");
-    scanf("%d", &cad_passa.classe); 
-
-    printf("Digite o número do assento desejado (ex: 45): ");
-    scanf("%u", &cad_passa.assento); 
-
-    printf("\nDigite o ID do voo que deseja cadastrar: ");
-    scanf("%d", &escolher_id);
-
-    FILE *verificar_pass = fopen("passageiros.json", "r");
-    if (verificar_pass != NULL) {
-        while (fgets(linha, sizeof(linha), verificar_pass) != NULL) {
-            cJSON *pass_salvo = cJSON_Parse(linha);
-            if (pass_salvo != NULL) {
-                contador_id++; 
-
-                int voo_salvo = cJSON_GetObjectItem(pass_salvo, "id_voo")->valueint;
-                unsigned int assento_salvo = (unsigned int)cJSON_GetObjectItem(pass_salvo, "assento")->valueint;
-                int classe_salva = cJSON_GetObjectItem(pass_salvo, "classe")->valueint;
-
-                if (voo_salvo == escolher_id && assento_salvo == cad_passa.assento && classe_salva == cad_passa.classe) {
-                    printf("\nErro: O assento %u já está ocupado nesta classe para este vôo!", cad_passa.assento);
-                    cJSON_Delete(pass_salvo);
-                    fclose(verificar_pass);
-                    return;
-                }
-                cJSON_Delete(pass_salvo);
-            }
-        }
-        fclose(verificar_pass);
-    }
-    cad_passa.id = contador_id + 1;
-
-    FILE *arquivo = fopen("voos.json", "r");
-    FILE *temporario = fopen("temp.json", "w");
-
-    if (arquivo != NULL && temporario != NULL)
-    {
-        while (fgets(linha, sizeof(linha), arquivo) != NULL)
-        {
+    if (arquivo != NULL) {
+        while (fgets(linha, sizeof(linha), arquivo) != NULL) {
             cJSON *voo_json = cJSON_Parse(linha);
-            if (voo_json != NULL)
-            {
-                int id_atual = cJSON_GetObjectItem(voo_json, "id")->valueint;
+            if(voo_json != NULL){
+                int id = cJSON_GetObjectItem(voo_json, "id")->valueint;
+                char *nome = cJSON_GetObjectItem(voo_json, "nome_voo")->valuestring;
+                int capacidade = cJSON_GetObjectItem(voo_json, "capacidade")->valueint;
+                int cap_primeira = cJSON_GetObjectItem(voo_json, "cap_primeira")->valueint;
+                int cap_economica = cJSON_GetObjectItem(voo_json, "cap_economica")->valueint;
+                char *destino = cJSON_GetObjectItem(voo_json, "destino")->valuestring;
+                char *horario = cJSON_GetObjectItem(voo_json, "horário")->valuestring;
+                float preco = (float)cJSON_GetObjectItem(voo_json, "preco")->valuedouble;
+                float preco_classe = (float)cJSON_GetObjectItem(voo_json, "preco_primeira_classe")->valuedouble;
 
-                if (id_atual == escolher_id)
-                {
-                    voo_encontrado = 1;
-                    
-                    if (cad_passa.classe == 1) { 
-                        int cap_p = cJSON_GetObjectItem(voo_json, "cap_primeira")->valueint;
-                        if (cap_p > 0) {
-                            cJSON_ReplaceItemInObject(voo_json, "cap_primeira", cJSON_CreateNumber(cap_p - 1));
-                        } else {
-                            printf("\nAssentos insuficientes na Primeira Classe!");
-                            cJSON_Delete(voo_json); fclose(arquivo); fclose(temporario); remove("temp.json");
-                            return;
-                        }
-                    } else { 
-                        int cap_e = cJSON_GetObjectItem(voo_json, "cap_economica")->valueint;
-                        if (cap_e > 0) {
-                            cJSON_ReplaceItemInObject(voo_json, "cap_economica", cJSON_CreateNumber(cap_e - 1));
-                        } else {
-                            printf("\nAssentos insuficientes na Classe Econômica!");
-                            cJSON_Delete(voo_json); fclose(arquivo); fclose(temporario); remove("temp.json");
-                            return;
-                        }
-                    }
-                    
-                    int cap_total = cJSON_GetObjectItem(voo_json, "capacidade")->valueint;
-                    cJSON_ReplaceItemInObject(voo_json, "capacidade", cJSON_CreateNumber(cap_total - 1));
-                }
-                
-                char *texto_voo = cJSON_PrintUnformatted(voo_json);
-                fprintf(temporario, "%s\n", texto_voo);
-                free(texto_voo);
+                printf("\nID %d | Voo: %s | Horário: %s | Destino %s | capacidade: %d | 1º Classe: %d | C.Econômica: %d | Preço-Classe econômica: %.2f | Preço-Primeira Classe %.2f\n", 
+                       id, nome, horario, destino, capacidade, cap_primeira, cap_economica, preco, preco_classe);
                 cJSON_Delete(voo_json);
             }
         }
         fclose(arquivo);
-        fclose(temporario);
-
-        if (voo_encontrado) {
-            remove("voos.json");
-            rename("temp.json", "voos.json");
-        } else {
-            remove("temp.json");
-            printf("\nErro: O ID do voo digitado não existe!");
-            return;
-        }
     } else {
-        printf("\nErro ao processar arquivo de voos.");
-        if (arquivo) fclose(arquivo);
-        if (temporario) fclose(temporario);
+        printf("\nArquivo não encontrado ou nenhum dado cadastrado\n");
         return;
     }
+    
+    #ifdef _WIN32
+    system("pause");
+    #else
+    printf("\nPressione ENTER para voltar...");
+    getchar(); getchar();
+    #endif
+}
 
-    cJSON *pass_json = cJSON_CreateObject();
-    cJSON_AddNumberToObject(pass_json, "id", cad_passa.id);
-    cJSON_AddNumberToObject(pass_json, "id_voo", escolher_id);
-    cJSON_AddNumberToObject(pass_json, "classe", cad_passa.classe);
-    cJSON_AddStringToObject(pass_json, "nome_passageiro", cad_passa.nome_passageiro);
-    cJSON_AddStringToObject(pass_json, "cpf", cad_passa.cpf);
-    cJSON_AddNumberToObject(pass_json, "assento", cad_passa.assento); 
+void cadastrar_passageiro(){
+    int opc = 1;
 
-    char *texto_JSON = cJSON_PrintUnformatted(pass_json);
-    FILE *arq_pass = fopen("passageiros.json", "a");
-    if (arq_pass != NULL) {
-        fprintf(arq_pass, "%s\n", texto_JSON);
-        fflush(arq_pass);
-        fclose(arq_pass);
-        printf("\nPassageiro cadastrado com sucesso! ID do Passageiro: %d\n", cad_passa.id);
-    } else {
-        printf("\nErro ao salvar arquivo de passageiros.");
-    }
+    do {
+        p cad_passa; 
+        char linha[MAX_READ];
+        int escolher_id;
+        int voo_encontrado = 0;
+        int contador_id = 0;
+        int assento_ocupado = 0;
 
-    free(texto_JSON);
-    cJSON_Delete(pass_json);
+        printf("\n---------Cadastrar passageiro----------\n");
 
-    printf("\nDigite a opção \n[1 para repetir ou 0 para cancelar]: ");
-    scanf("%d", &opc);
- }while(opc != 0);
- system("pause");
+        printf("Digite o nome do passageiro: ");
+        scanf(" %[^\n]", cad_passa.nome_passageiro);
+
+        printf("Digite o cpf do passageiro: ");
+        scanf(" %[^\n]", cad_passa.cpf);
+
+        printf("Digite a classe:\n[1] para primeira classe\n[0] para classe econômica\nOpção: ");
+        scanf("%d", &cad_passa.classe); 
+
+        printf("Digite o número do assento desejado (ex: 45): ");
+        scanf("%u", &cad_passa.assento); 
+
+        printf("\nDigite o ID do voo que deseja cadastrar: ");
+        scanf("%d", &escolher_id);
+
+        FILE *verificar_pass = fopen("passageiros.json", "r");
+        if (verificar_pass != NULL) {
+            while (fgets(linha, sizeof(linha), verificar_pass) != NULL) {
+                cJSON *pass_salvo = cJSON_Parse(linha);
+                if (pass_salvo != NULL) {
+                    contador_id++; 
+
+                    int voo_salvo = cJSON_GetObjectItem(pass_salvo, "id_voo")->valueint;
+                    unsigned int assento_salvo = (unsigned int)cJSON_GetObjectItem(pass_salvo, "assento")->valueint;
+                    int classe_salva = cJSON_GetObjectItem(pass_salvo, "classe")->valueint;
+
+                    if (voo_salvo == escolher_id && assento_salvo == cad_passa.assento && classe_salva == cad_passa.classe) {
+                        printf("\nErro: O assento %u já está ocupado nesta classe para este vôo!", cad_passa.assento);
+                        assento_ocupado = 1;
+                        cJSON_Delete(pass_salvo);
+                        break;
+                    }
+                    cJSON_Delete(pass_salvo);
+                }
+            }
+            fclose(verificar_pass);
+        }
+
+        if (assento_ocupado) {
+            printf("\nTentativa abortada. Deseja tentar novamente?\n[1 para Sim / 0 para Sair]: ");
+            scanf("%d", &opc);
+            continue;
+        }
+
+        cad_passa.id = contador_id + 1;
+
+        FILE *arquivo = fopen("voos.json", "r");
+        FILE *temporario = fopen("temp.json", "w");
+        int erro_vagas = 0;
+
+        if (arquivo != NULL && temporario != NULL) {
+            while (fgets(linha, sizeof(linha), arquivo) != NULL) {
+                cJSON *voo_json = cJSON_Parse(linha);
+                if (voo_json != NULL) {
+                    int id_atual = cJSON_GetObjectItem(voo_json, "id")->valueint;
+
+                    if (id_atual == escolher_id) {
+                        voo_encontrado = 1;
+                        
+                        if (cad_passa.classe == 1) { 
+                            int cap_p = cJSON_GetObjectItem(voo_json, "cap_primeira")->valueint;
+                            if (cap_p > 0) {
+                                cJSON_ReplaceItemInObject(voo_json, "cap_primeira", cJSON_CreateNumber(cap_p - 1));
+                            } else {
+                                printf("\nAssentos insuficientes na Primeira Classe!");
+                                erro_vagas = 1;
+                            }
+                        } else { 
+                            int cap_e = cJSON_GetObjectItem(voo_json, "cap_economica")->valueint;
+                            if (cap_e > 0) {
+                                cJSON_ReplaceItemInObject(voo_json, "cap_economica", cJSON_CreateNumber(cap_e - 1));
+                            } else {
+                                printf("\nAssentos insuficientes na Classe Econômica!");
+                                erro_vagas = 1;
+                            }
+                        }
+                        
+                        if (!erro_vagas) {
+                            int cap_total = cJSON_GetObjectItem(voo_json, "capacidade")->valueint;
+                            cJSON_ReplaceItemInObject(voo_json, "capacidade", cJSON_CreateNumber(cap_total - 1));
+                        }
+                    }
+                    
+                    char *texto_voo = cJSON_PrintUnformatted(voo_json);
+                    fprintf(temporario, "%s\n", texto_voo);
+                    free(texto_voo);
+                    cJSON_Delete(voo_json);
+                }
+            }
+            fclose(arquivo);
+            fclose(temporario);
+
+            if (erro_vagas) {
+                remove("temp.json");
+                printf("\nCadastro não efetuado por falta de vagas. Deseja tentar novamente?\n[1 para Sim / 0 para Sair]: ");
+                scanf("%d", &opc);
+                continue;
+            }
+
+            if (voo_encontrado) {
+                remove("voos.json");
+                rename("temp.json", "voos.json");
+            } else {
+                remove("temp.json");
+                printf("\nErro: O ID do voo digitado não existe! Deseja tentar novamente?\n[1 para Sim / 0 para Sair]: ");
+                scanf("%d", &opc);
+                continue;
+            }
+        } else {
+            printf("\nErro ao processar arquivo de voos.");
+            if (arquivo) fclose(arquivo);
+            if (temporario) fclose(temporario);
+            return;
+        }
+
+        cJSON *pass_json = cJSON_CreateObject();
+        cJSON_AddNumberToObject(pass_json, "id", cad_passa.id);
+        cJSON_AddNumberToObject(pass_json, "id_voo", escolher_id);
+        cJSON_AddNumberToObject(pass_json, "classe", cad_passa.classe);
+        cJSON_AddStringToObject(pass_json, "nome_passageiro", cad_passa.nome_passageiro);
+        cJSON_AddStringToObject(pass_json, "cpf", cad_passa.cpf);
+        cJSON_AddNumberToObject(pass_json, "assento", cad_passa.assento); 
+
+        char *texto_JSON = cJSON_PrintUnformatted(pass_json);
+        FILE *arq_pass = fopen("passageiros.json", "a");
+        if (arq_pass != NULL) {
+            fprintf(arq_pass, "%s\n", texto_JSON);
+            fflush(arq_pass);
+            fclose(arq_pass);
+            printf("\nPassageiro cadastrado com sucesso! ID do Passageiro: %d\n", cad_passa.id);
+        } else {
+            printf("\nErro ao salvar arquivo de passageiros.");
+        }
+
+        free(texto_JSON);
+        cJSON_Delete(pass_json);
+
+        printf("\nDeseja cadastrar outro passageiro?\n[1 para Sim / 0 para Cancelar]: ");
+        scanf("%d", &opc);
+    } while(opc != 0);
 }
 
 void confirmar_voo() {
@@ -264,14 +279,11 @@ void confirmar_voo() {
     char cpf_digitado[MAX];
     int id_voo_pesquisa;
     int voo_tem_passageiros;
-
     int faltas_primeira;
     int faltas_economica;
 
     do {
-        printf("\n========================================\n");
-        printf("          CONFIRMAÇÃO DE VOO            \n");
-        printf("========================================\n");
+        printf("\n--------Confirmar voo---------\n");
         printf("Digite o ID do voo para iniciar as confirmações\n");
         printf("(ou digite 0 para voltar ao menu principal): ");
         scanf("%d", &id_voo_pesquisa);
@@ -307,7 +319,6 @@ void confirmar_voo() {
 
                         if (strcmp(cpf_salvo, cpf_digitado) == 0) {
                             printf("Embarque CONFIRMADO com sucesso para %s!\n", nome_pass);
-                            
                             char *texto_confirmado = cJSON_PrintUnformatted(pass_json);
                             fprintf(arq_confirmados, "%s\n", texto_confirmado);
                             free(texto_confirmado);
@@ -323,7 +334,6 @@ void confirmar_voo() {
                             fprintf(temp_pass, "%s\n", texto_pendente);
                             free(texto_pendente);
                         }
-                        system("pause");
                     } else {
                         char *texto_outro_voo = cJSON_PrintUnformatted(pass_json);
                         fprintf(temp_pass, "%s\n", texto_outro_voo);
@@ -341,7 +351,6 @@ void confirmar_voo() {
 
             if (!voo_tem_passageiros) {
                 printf("\nNenhum passageiro pendente encontrado para o voo ID %d.\n", id_voo_pesquisa);
-                system("pause");
             } else {
                 printf("\nProcessamento de embarque finalizado para o voo ID %d.\n", id_voo_pesquisa);
                 printf("Não comparecimentos - 1º Classe: %d | Classe Econômica: %d\n", faltas_primeira, faltas_economica);
@@ -408,22 +417,17 @@ void confirmar_voo() {
                         if (temp_limpeza) fclose(temp_limpeza);
                     }
                 }
-                system("pause");
+                printf("\nPressione ENTER para continuar...\n");
+                getchar(); getchar();
             }
         } else {
             printf("\nErro ao processar arquivos do sistema.\n");
             if (arquivo_pass) fclose(arquivo_pass);
             if (temp_pass) fclose(temp_pass);
             if (arq_confirmados) fclose(arq_confirmados);
-            system("pause");
             break;
         }
 
-        #ifdef _WIN32
-        system("cls");
-        #else
-        system("clear");
-        #endif
 
     } while (id_voo_pesquisa != 0);
 }
@@ -466,6 +470,8 @@ void editar_voo() {
                     printf("[2] Alterar Destino\n");
                     printf("[3] Alterar Horário\n");
                     printf("[4] Alterar Capacidade Total\n");
+                    printf("[5] Alterar Preço da Classe Económica\n");
+                    printf("[6] Alterar Preço da Primeira Classe\n");
                     printf("Escolha a opção que deseja editar: ");
                     scanf("%d", &opcao_edicao);
 
@@ -513,6 +519,21 @@ void editar_voo() {
                                 printf("\nCapacidade alterada e redistribuída com sucesso!");
                             }
                             break;
+                            case 5:
+                                printf("Digite o novo preço da classe económica: ");
+                                float novo_p_econ;
+                                scanf("%f", &novo_p_econ);
+                                cJSON_ReplaceItemInObject(voo_json, "preco", cJSON_CreateNumber(novo_p_econ));
+                                printf("\nPreço da classe económica alterado com sucesso!");
+                            break;
+
+                            case 6:
+                                printf("Digite o novo preço da primeira classe: ");
+                                float novo_p_prim;
+                                scanf("%f", &novo_p_prim);
+                                cJSON_ReplaceItemInObject(voo_json, "preco_primeira_classe", cJSON_CreateNumber(novo_p_prim));
+                                printf("\nPreço da primeira classe alterado com sucesso!");
+                                break;
 
                         default:
                             printf("\nOpção inválida! Nenhuma alteração foi feita.");
@@ -541,8 +562,6 @@ void editar_voo() {
         if (arquivo) fclose(arquivo);
         if (temporario) fclose(temporario);
     }
-    printf("\n");
-    system("pause");
 }
 
 void editar_passageiro() {
@@ -713,8 +732,6 @@ void editar_passageiro() {
         if (arquivo) fclose(arquivo);
         if (temporario) fclose(temporario);
     }
-    printf("\n");
-    system("pause");
 }
 
 int main(){
@@ -722,42 +739,35 @@ int main(){
     #ifdef _WIN32
     SetCurrentDirectory("C:\\Users\\endua\\Videos\\airport");
     #else
-    system("cd \"$(dirname \"$0\")\"");
-    // system("cd /Volumes/PROJETO/airport");
     system("pwd");
     #endif
-   do{
-    printf("\n-------Sistema de Aeroporto--------\n");
-    printf("\n[1] Cadastrar voo");
-    printf("\n[2] Voos cadastrados");
-    printf("\n[3] Cadastrar passageiro");
-    printf("\n[4] Confirmar voo");
 
-    printf("\n------Sistema-------\n");
-    printf("\n[5] Editar voo");
-    printf("\n[6] Editar passageiro");
+    do {
+        printf("\n-------Sistema de Aeroporto--------\n");
+        printf("\n[1] Cadastrar voo");
+        printf("\n[2] Voos cadastrados");
+        printf("\n[3] Cadastrar passageiro");
+        printf("\n[4] Confirmar voo");
 
-    printf("\n[0] para sair\n");
-    printf("\nEscolha uma opção: ");
-    scanf("%d", &opc);
+        printf("\n------Sistema-------\n");
+        printf("\n[5] Editar voo");
+        printf("\n[6] Editar passageiro");
 
-    switch (opc)
-    {
-    case 1: cadastrar_voo(); break;
-    case 2: historico_voo(); break;
-    case 3: cadastrar_passageiro(); break;
-    case 4: confirmar_voo(); break;
-    case 5: editar_voo(); break;
-    case 6: editar_passageiro(); break;
-    case 0: printf("\nSaindo! Tenha um ótimo dia.") break;
-    default: printf("\nOpção inválida ou não encontrada\n"); break;
-    }
+        printf("\n[0] para sair\n");
+        printf("\nEscolha uma opção: ");
+        scanf("%d", &opc);
 
-   }while (opc != 0);
+        switch (opc) {
+            case 1: cadastrar_voo(); break;
+            case 2: historico_voo(); break;
+            case 3: cadastrar_passageiro(); break;
+            case 4: confirmar_voo(); break;
+            case 5: editar_voo(); break;
+            case 6: editar_passageiro(); break;
+            case 0: printf("\nSaindo! Tenha um ótimo dia.") break 
+            default: printf("\nOpção inválida ou não encontrada\n"); break;
+        }
+    } while (opc != 0);
    
-   
-    
-
     return 0;
 }
-
